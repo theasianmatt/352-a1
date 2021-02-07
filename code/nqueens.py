@@ -8,7 +8,7 @@ def print_board(queens, board_size):
         print("X",end='')
     print()
     for row in range(board_size):
-        for column in range(board_size):
+        for column in range(board_size+1):
             occupied=False
             for i, q in enumerate(queens):
                 if i == column and q == row +1:
@@ -36,7 +36,7 @@ def validate(queens, i):
 
     q = queens[i]
     for j, q2 in enumerate(queens):
-        if i != j:
+        if (i != j) and (i != 0) and (j!=0):
             # Same row (columns are always different)
             if q == q2:
                 errors += 1
@@ -51,11 +51,13 @@ def validate(queens, i):
 def count_errors(queens):
     errors = []
     total = 0
-    for i in range(len(queens)):
+    for i in range(1, len(queens)):
         e = validate(queens, i)
         total += e
         errors.append((i, e))
     errors.sort(key=lambda tup: tup[1], reverse=True)
+#    print("Errors: ")
+#    print(errors)
     return (total, errors)
 
 
@@ -66,11 +68,14 @@ def solve(board_size):
     global max_steps
     # List of n queens
     queens = generate_start_board(board_size)
+#    print("Initial board:")
+#    print_board(queens,board_size)
     for count in range(max_steps):
         errors, error_queens = count_errors(queens)
         if errors > 0:
             # get the worst queen
-            worst = error_queens.pop()
+            #worst = error_queens.pop()
+            worst = error_queens[0]
             # do something
             # min conflict
             # take the queen with the most conflicts (first queen in error list)
@@ -99,5 +104,6 @@ def solve(board_size):
 
 
 if __name__ == "__main__":
-    print(count_errors([3,1,4,2]))
-    print(count_errors([1,1,1,2]))
+    #print(count_errors([3,1,4,2]))
+#print(count_errors([1,1,1,2]))
+    print(solve(4));
