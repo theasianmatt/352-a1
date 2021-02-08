@@ -1,8 +1,9 @@
 import random
 import time
+import itertools
 # create starting spots for queens
 # start w one queen per column, all in first row
-max_steps = 100
+#max_steps = 100
 
 def print_board(queens, board_size):
     for i in range(board_size):
@@ -24,8 +25,9 @@ def generate_start_board(board_size):
     start_positions = []
     for j in range(board_size):
         # uncomment for random start
-        start_positions.append(random.randint(1,board_size))
-        #start_positions.append(j+1)
+        #start_positions.append(random.randint(1,board_size))
+        start_positions.append(j+1)
+    random.shuffle(start_positions)
     return start_positions
 
 
@@ -77,7 +79,8 @@ def get_best_pos(queens,q,board_size):
 #  - Make sure the list is the right length, and uses the numbers from 0 .. BOARD_SIZE-1
 
 def solve(board_size):
-    global max_steps
+    #global max_steps
+    max_steps = board_size
     start = time.time()
     # List of n queens
     # min-conflics alg
@@ -114,4 +117,9 @@ def solve(board_size):
 
 
 if __name__ == "__main__":
-    print(solve(4));
+    solve(10)
+    solve(100)
+    solve(1000)
+    solve(10000)
+    solve(100000)
+    solve(1000000)
