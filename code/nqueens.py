@@ -107,4 +107,7 @@ def solve(board_size):
 if __name__ == "__main__":
     #print(count_errors([3,1,4,2]))
 #print(count_errors([1,1,1,2]))
-    print(solve(4));
+   
+    print(solve(4))
+    print(solve(5))
+    print(solve(10))
