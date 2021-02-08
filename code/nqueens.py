@@ -1,7 +1,8 @@
 import random
+import time
 # create starting spots for queens
 # start w one queen per column, all in first row
-max_steps = 1000
+max_steps = 100
 
 def print_board(queens, board_size):
     for i in range(board_size):
@@ -22,15 +23,13 @@ def print_board(queens, board_size):
 def generate_start_board(board_size):
     start_positions = []
     for j in range(board_size):
-        # print(startPositions)
+        # uncomment for random start
         start_positions.append(random.randint(1,board_size))
-        #print(start_positions)
-        # Do something with list of starting positions
-        #print(count_errors(start_positions))
+        #start_positions.append(j+1)
     return start_positions
 
 
-# Returns false if not valid, true if valid
+# returns number of conflicts
 def validate(queens, i):
     errors = 0
 
@@ -47,7 +46,7 @@ def validate(queens, i):
                 errors += 1
     return errors
 
-
+# Count errors for all queens 
 def count_errors(queens):
     errors = []
     total = 0
@@ -55,56 +54,64 @@ def count_errors(queens):
         e = validate(queens, i)
         total += e
         errors.append((i, e))
-    #errors.sort(key=lambda tup: tup[1], reverse=True)
-    random.shuffle(errors)
-#    print("Errors: ")
-#    print(errors)
+    errors.sort(key=lambda tup: tup[1], reverse=True)
+    # returns a random list of the worst queens
+    # uncomment for random
+    #random.shuffle(errors)
     return (total, errors)
 
+# Find the least conflicted square to move
+def get_best_pos(queens,q,board_size):
+    tempq = queens.copy()
+    lowest = 1000000000000
+    lowest_i = -1
+    for i in range(board_size):
+        tempq[q] = i + 1
+        e = validate(tempq, q)
+        if e < lowest:
+            lowest = e
+            lowest_i = i + 1
+    return lowest_i
 
 # Implement a solver that returns a list of queen's locations
 #  - Make sure the list is the right length, and uses the numbers from 0 .. BOARD_SIZE-1
 
 def solve(board_size):
     global max_steps
+    start = time.time()
     # List of n queens
-    queens = generate_start_board(board_size)
-    for count in range(max_steps):
-        errors, error_queens = count_errors(queens)
-        if errors > 0:
-            # get the worst queen
-            worst = error_queens.pop()
-            #worst = error_queens[0]
-            # do something
-            # min conflict
-            # take the queen with the most conflicts (first queen in error list)
-            # move it to the postition with the least conflicts (figure this out)
-            tempq = queens.copy()
-            lowest = 1000000000000
-            lowest_i = -1
-            for i in range(board_size):
-                tempq[worst[0]] = i + 1
-                e = validate(tempq, worst[0])
-                if e < lowest:
-                    lowest = e
-                    lowest_i = i + 1
-                #print_board(tempq,board_size)
-                #print("Loop {} errors: {} e: {}".format(count,errors,e))
-            #print("Lowest {} lowest i {}".format(lowest,lowest_i))
-            #print(error_queens)
-            queens[worst[0]] = lowest_i
-            #print_board(queens,board_size)
-        else:
-            print("SOLVED in {}".format(count))
-            print(queens)
-            return queens
+    # min-conflics alg
+    tries = 0
+    while time.time()-start < 1800:
+        tries+=1
+        queens = generate_start_board(board_size)
+        error_queens = []
+        for count in range(max_steps):
+            errors, temp= count_errors(queens)
+            if len(error_queens) == 0 or temp[0][1] < error_queens[0][1]:
+                #    print("{} {} {}".format(count,error_queens,temp))
+                error_queens = []
+                for x in temp:
+                    if x[1] == temp[0][1]:
+                        error_queens.append(x)
+                    else:
+                        break
+                random.shuffle(error_queens)
+            if errors > 0:
+                # get the worst queen
+                worst = error_queens.pop()
+                queens[worst[0]] = get_best_pos(queens,worst[0],board_size)
+                #print_board(queens,board_size)
+            else:
+                print("SOLVED {}-queen problem in {} steps with {} seconds on try {}".format(board_size,count, time.strftime("%H:%M:%S", time.gmtime(time.time() - start)),tries))
+                #print_board(queens,board_size)
+                return queens
 
     # should never get here unless fail
-    print("FAILED in {}".format(max_steps))
+    print("FAILED {}-queen problem in {} steps with {} seconds on try {}".format(board_size,count, time.strftime("%H:%M:%S", time.gmtime(time.time() - start)),tries))
+    #print_board(queens,board_size)
     return queens
 
 
 if __name__ == "__main__":
-    #print(count_errors([3,1,4,2]))
-#print(count_errors([1,1,1,2]))
     print(solve(4));
